@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device name="presence">
+    <sensors>
+        <sensor name="presence">
+            <values type="boolean">
+                <value>true</value>
+                <value>false</value>
+            </values>
+        </sensor>
+    </sensors>
+</device>
