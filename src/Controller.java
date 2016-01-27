@@ -1,7 +1,9 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,18 +15,29 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
-public final class Init {
-	private String devicesPath;
+public class Controller {
+	private Properties config;
+	private List<VirtualDevice> devices;
 	
+	public Controller(Properties config) throws IOException, SAXException {
+		this.config = config;
+		devices = new ArrayList<VirtualDevice>();
+	}
 	
-	public Init(String devicesPath) {
-		this.devicesPath = devicesPath;
+	public MQTTOperations connectDeviceMqtt(){
+		MQTTOperations mqtt = new MQTTOperations(this.config.getProperty("broker_mqtt.url"),
+												 this.config.getProperty("broker_mqtt.port"),
+												 this.config.getProperty("virtual_devices.id"),
+												 this.config.getProperty("broker_mqtt.username"),
+												 this.config.getProperty("broker_mqtt.password"),
+												 this.devices);
+		return mqtt;
 	}
 
 
-	public List<VirtualDevice> getDevices() throws SAXException, IOException{
+	public void loadDevices() throws SAXException, IOException{
 		
-		File folder = new File(this.devicesPath);
+		File folder = new File(this.config.getProperty("virtual_devices.path"));
 		List<VirtualDevice> devices = new ArrayList<VirtualDevice>();;
 		List<File> xmlFiles = new ArrayList<File>();
 		
@@ -37,7 +50,7 @@ public final class Init {
 			devices.add(createDevice(file));
 			
 		}
-		return devices;
+		this.devices = devices;
 	}
 	
 	private VirtualDevice createDevice(File file) throws SAXException, IOException{
@@ -69,6 +82,11 @@ public final class Init {
 		
 		return device;
 	}
-	
+
+
+	public List<VirtualDevice> getDevices() {
+		return devices;
+	}
+
 
 }

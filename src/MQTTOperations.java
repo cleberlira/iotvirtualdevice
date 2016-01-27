@@ -40,12 +40,11 @@ public class MQTTOperations implements MqttCallback{
 			this.subscriber.setCallback(this);
 			this.subscriber.connect(connOpt);
 			subscribeDevices(1);
+			System.out.println("Topic devices subscribed");
 			
-			this.publisher = new MqttClient(this.brokerUrl + ":" + this.brokerPort, this.serverId + "_publisher");
+			this.publisher = new MqttClient(this.brokerUrl + ":" + this.brokerPort, this.serverId + "_pub");
 			this.publisher.setCallback(this);
 			this.publisher.connect(connOpt);
-			
-			System.out.println("Topic devices subscribed");
 		} catch (MqttException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
