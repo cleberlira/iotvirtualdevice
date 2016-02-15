@@ -145,6 +145,16 @@ public class MQTTOperations implements MqttCallback{
 		}
     
     
+	public void disconnect(){
+		try {
+			this.subscriber.disconnect();
+			this.publisher.disconnect();
+		} catch (MqttException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+	}
 	
 	public void test(){
 		MqttMessage message = new MqttMessage();
