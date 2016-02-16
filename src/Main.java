@@ -9,17 +9,18 @@ import org.xml.sax.SAXException;
 public class Main {
 
 	public static void main(String[] args) throws SAXException, IOException {
-		
-
-		System.out.println("Starting the IoT Virtual Devices...");
-		Properties config = new Properties();
-		FileInputStream file = new FileInputStream("../config.properties");
-		config.load(file);
-		
-		Controller controller = new Controller(config);
-		controller.loadDevices();
-		controller.connectDeviceMqtt();
-		System.out.println("IoT Virtual Devices connected...");
+		if(args.length > 0){
+			Properties config = new Properties();
+			FileInputStream file = new FileInputStream(args[0]);
+			config.load(file);
+			
+			Controller controller = new Controller(config);
+			controller.loadDevices();
+			controller.connectDeviceMqtt();
+		}else{
+			System.out.println("To execute IoT Virtual Device you need pass config.properties path as parameter");
+			System.exit(-1);
+		}
 		
 	}
 

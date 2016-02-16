@@ -4,10 +4,26 @@ DESC="IoT Virtual Devices"
 NAME=iot_virtual_devices
 PIDFILE=/var/run/$NAME.pid
 RUN_AS=root
-COMMAND=/usr/bin/java -jar /usr/share/iot_virtual_devices/iot_virtual_devices.jar
+COMMAND=/usr/bin/java
+CMD_PARAMS="-jar /usr/share/iot_virtual_devices/iot_virtual_devices.jar /usr/share/iot_virtual_devices/config.properties"
+CONFIG_PATH=/usr/share/iot_virtual_devices/
 
 d_start() {
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --chuid $RUN_AS --exec $COMMAND
+    cd $CONFIG_PATH
+    #start-stop-daemon --start --make-pidfile --pidfile $PIDFILE --exec $COMMAND -- $CMD_PARAMS
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --chuid $RUN_AS --exec $COMMAND -- $CMD_PARAMS
+
+    e=$?
+    if [ $e -eq 1 ]; then
+       echo "already running"
+       return
+    fi
+
+    if [ $e -eq 255 ]; then
+       echo "couldn't start :("
+       exit 1
+    fi
+
 }
 
 d_stop() {

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR=/usr/share/iot_virtual_devices
+LOCAL_DIR=`pwd`
 
 printf "Installing IoT Virtual Devices in boot of system...\n\n\n"
 
@@ -10,7 +11,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 mkdir -p $DIR
-ln -s ../config.properties `echo $DIR`/config.properties
+ln -s `echo $LOCAL_DIR`/../config.properties `echo $DIR`/config.properties
 cp ../target/IoT_VirtualDevice-0.0.1-SNAPSHOT-jar-with-dependencies.jar `echo $DIR`/iot_virtual_devices.jar
 
 
