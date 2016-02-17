@@ -129,17 +129,20 @@ public class MQTTOperations implements MqttCallback{
 			VirtualSensor sensor = device.getSensor(sensorName);
 			int i = randomGenerator.nextInt(sensor.getValues().size());
 			Object value = sensor.getValues().get(i);
-			String msg = "POST "  + device.getName()+ ":{HEADER:{" + sensor.getName() + "},BODY:{"; //<resposta>}}"
-			if(type.contentEquals("INFO") || type.contentEquals("VALUE")){
+			String msg = "POST "  + device.getName()+ ":{\"HEADER\":{\"name\":\"" + sensor.getName() + "\"},\"BODY\":"; //<resposta>}}"
+			if(type.contentEquals("INFO")){
 				msg = msg + value;
-			}else if(type.contentEquals("STATE")){
+			} else if(type.contentEquals("VALUE")) {
+				msg = msg + "\"" + value + "\"";
+			}
+			else if(type.contentEquals("STATE")){
 				if(((String)value).contentEquals("true")){
-					msg = msg + "T";
+					msg = msg + "\"T\"";
 				}else{
-					msg = msg + "F";
+					msg = msg + "\"F\"";
 				}
 			}
-			msg = msg + "}}";
+			msg = msg + "}";
 			answer.setPayload(msg.getBytes());
 			return answer;
 		}
