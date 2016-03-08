@@ -131,11 +131,11 @@ public class MQTTOperations implements MqttCallback{
 			VirtualSensor sensor = device.getSensor(sensorName);
 			int i = randomGenerator.nextInt(sensor.getValues().size());
 			Object value = sensor.getValues().get(i);
-			String msg = "POST "  + device.getName()+ ":{\"HEADER\":{\"name\":\"" + sensor.getName() + "\"},\"BODY\":"; //<resposta>}}"
+			String msg = "POST "  + device.getName()+ ":{\"HEADER\":{\"name\":\"" + sensor.getDevice().getName() + "\"},\"BODY\":{\"" + sensor.getName() + "\":"; //<resposta>}}"
 			if(type.contentEquals("INFO")){
-				msg = msg + value;
-			} else if(type.contentEquals("VALUE")) {
 				msg = msg + "\"" + value + "\"";
+			} else if(type.contentEquals("VALUE")) {
+				msg = msg + value;
 			}
 			else if(type.contentEquals("STATE")){
 				if(((String)value).contentEquals("true")){
@@ -144,7 +144,7 @@ public class MQTTOperations implements MqttCallback{
 					msg = msg + "\"F\"";
 				}
 			}
-			msg = msg + "}";
+			msg = msg + "}}";
 			answer.setPayload(msg.getBytes());
 			return answer;
 		}

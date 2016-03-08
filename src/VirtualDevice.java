@@ -12,6 +12,11 @@ public class VirtualDevice {
 		this.sensors = sensors;
 	}
 	
+	public VirtualDevice(String name) {
+		this.name = name;
+		this.sensors = null;
+	}
+	
 	public String getName() {
 		return name;
 	}

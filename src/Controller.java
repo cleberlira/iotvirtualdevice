@@ -61,6 +61,8 @@ public class Controller {
 			DocumentBuilder dBuilder;
 			dBuilder = dbFactory.newDocumentBuilder();
 			Document docDevice = dBuilder.parse(file);
+			device = new VirtualDevice(docDevice.getDocumentElement().getAttribute("name"));
+			
 			NodeList sensorList = docDevice.getElementsByTagName("sensor");
 			List<VirtualSensor> sensors = new ArrayList<VirtualSensor>();
 			for(int i=0;i < sensorList.getLength(); i++){
@@ -73,9 +75,9 @@ public class Controller {
 				String name = eSensor.getAttribute("name");
 				Element eValue = (Element) eSensor.getElementsByTagName("values").item(0);
 				String type_value = eValue.getAttribute("type");
-				sensors.add(new VirtualSensor(name, type_value, values));
+				sensors.add(new VirtualSensor(name, type_value, values, device));
 			}
-			device = new VirtualDevice(docDevice.getDocumentElement().getAttribute("name"), sensors);
+			device.setSensors(sensors);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
