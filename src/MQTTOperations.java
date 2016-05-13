@@ -36,8 +36,11 @@ public class MQTTOperations implements MqttCallback{
 		this.devices = devices;
 		
 		try {
-			connOpt.setUserName(this.username);
-			connOpt.setPassword(this.password.toCharArray());
+			if(!this.username.isEmpty())
+				connOpt.setUserName(this.username);
+			if(!this.password.isEmpty())
+				connOpt.setPassword(this.password.toCharArray());
+			
 			this.subscriber = new MqttClient(this.brokerUrl + ":" + this.brokerPort, this.serverId);
 			this.subscriber.setCallback(this);
 			this.subscriber.connect(connOpt);
