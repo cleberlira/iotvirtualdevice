@@ -94,16 +94,10 @@ public class MQTTOperations implements MqttCallback {
 		System.out.println("-------------------------------------------------");
 		String messageContent = new String(message.getPayload());
 
-		try {
-			JSONObject json = new JSONObject(messageContent);
-			
-			if (json.get("CODE").toString().contentEquals("GET")) {
-				VirtualDevice device = getDeviceOfTopic(topic);
-				MqttMessage answer = buildAnwserDevice(topic, device, json);
-				this.publisher.publish(topic + "/RES", answer);
-			}
-		} catch (org.json.JSONException e) {
-
+		if (messageContent.substring(0, 3).contentEquals(new String("GET"))){
+    		VirtualDevice device = getDeviceOfTopic(topic);
+    		MqttMessage answer = buildAnwserDevice(topic, device,message);
+    		this.publisher.publish(topic + "/RES", answer);
 		}
 		
 
@@ -137,14 +131,15 @@ public class MQTTOperations implements MqttCallback {
 	}
 
 	private MqttMessage buildAnwserDevice(String topic, VirtualDevice device,
-			JSONObject message) {
+			MqttMessage message) {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
 		
 		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
 		
-		String type = message.getString("DATA");
-		String sensorName = message.getString("VAR");
+		String messageContent = new String(message.getPayload());
+		String type = messageContent.split(" ")[1];
+		String sensorName = messageContent.split(" ")[2];
 
 		VirtualSensor sensor = device.getSensor(sensorName);
 		int i = randomGenerator.nextInt(sensor.getValues().size());
