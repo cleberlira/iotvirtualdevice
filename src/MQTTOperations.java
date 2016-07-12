@@ -150,10 +150,12 @@ public class MQTTOperations implements MqttCallback {
 		JSONObject body = new JSONObject();
 		header.put("NAME", sensor.getDevice().getName());
 		body.put(sensor.getName(), value);
+		response.put("METHOD", "GET");
 		response.put("CODE", "POST");
 		response.put("HEADER", header);
 		response.put("BODY", body);
-
+		
+		System.out.println(response.toString());
 		answer.setPayload(response.toString().getBytes());
 		return answer;
 	}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<device name="humidTemp">
+<device name="ufbaino01">
     <sensors>
-        <sensor name="humidity">
+        <sensor name="humiditySensor">
             <values type="integer">
                 <value>80</value>
                 <value>79</value>
@@ -16,7 +16,7 @@
                 <value>70</value>
             </values>
         </sensor>
-        <sensor name="temperature">
+        <sensor name="temperatureSensor">
             <values type="integer">
                 <value>39</value>
                 <value>38</value>
