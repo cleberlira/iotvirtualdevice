@@ -1,5 +1,7 @@
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -22,10 +24,10 @@ public class MQTTOperations implements MqttCallback {
 	private MqttClient subscriber;
 	private MqttClient publisher;
 	private List<VirtualDevice> devices;
+	Hashtable flowStatus;
 
 	public MQTTOperations(String brokerUrl, String brokerPort, String serverId,
 			String username, String password, List<VirtualDevice> devices) {
-
 		MqttConnectOptions connOpt = new MqttConnectOptions();
 
 		this.brokerUrl = brokerUrl;
@@ -34,6 +36,8 @@ public class MQTTOperations implements MqttCallback {
 		this.username = username;
 		this.password = password;
 		this.devices = devices;
+
+		this.flowStatus = new Hashtable<String, Object>();
 
 		try {
 			if (!this.username.isEmpty())
@@ -86,7 +90,7 @@ public class MQTTOperations implements MqttCallback {
 	}
 
 	@Override
-	public void messageArrived(String topic, MqttMessage message)
+	public void messageArrived(final String topic, final MqttMessage message)
 			throws Exception {
 		System.out.println("-------------------------------------------------");
 		System.out.println("| Topic:" + topic);
@@ -94,12 +98,45 @@ public class MQTTOperations implements MqttCallback {
 		System.out.println("-------------------------------------------------");
 		String messageContent = new String(message.getPayload());
 
-		if (messageContent.substring(0, 3).contentEquals(new String("GET"))){
-    		VirtualDevice device = getDeviceOfTopic(topic);
-    		MqttMessage answer = buildAnwserDevice(topic, device,message);
-    		this.publisher.publish(topic + "/RES", answer);
+		if (messageContent.substring(0, 3).contentEquals(new String("GET"))) {
+			VirtualDevice device = getDeviceOfTopic(topic);
+			MqttMessage answer = buildGetAnwserDevice(topic, device, message);
+			this.publisher.publish(topic + "/RES", answer);
+		} else if (messageContent.substring(0, 4).contentEquals(
+				new String("FLOW"))) {
+			final MqttClient publisherInt = this.publisher;
+			final VirtualDevice device = getDeviceOfTopic(topic);
+			String sensorName = messageContent.split(" ")[2];
+
+			Thread flow = getThreadByName(device.getName() + sensorName);
+			if (flow != null) {
+				flow.interrupt();
+			}
+			if (!isFlowSetOff(messageContent)){
+				flow = new Thread() {
+					public void run() {
+						try {
+							while (true) {
+								MqttMessage answer = buildFlowAnwserDevice(
+										topic, device, message);
+								publisherInt.publish(topic + "/RES",
+								answer);
+							}
+						} catch (InterruptedException v) {
+							System.out.println(v);
+						} catch (MqttPersistenceException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (MqttException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				};
+				flow.start();
+				flow.setName(device.getName() + sensorName);
+			}
 		}
-		
 
 	}
 
@@ -107,6 +144,19 @@ public class MQTTOperations implements MqttCallback {
 	public void deliveryComplete(IMqttDeliveryToken token) {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private boolean isFlowSetOff(String msg){
+		String sensorName = msg.split(" ")[2];
+		String configuration = msg.split(sensorName + " ")[1];
+		
+		JSONObject confJSON = new JSONObject(configuration);
+		
+		if (confJSON.has("turn")){
+			return(!confJSON.getBoolean("turn"));
+		}else{
+			return false;
+		}
 	}
 
 	private void subscribeDevices(int qos) {
@@ -130,13 +180,13 @@ public class MQTTOperations implements MqttCallback {
 		return null;
 	}
 
-	private MqttMessage buildAnwserDevice(String topic, VirtualDevice device,
-			MqttMessage message) {
+	private MqttMessage buildGetAnwserDevice(String topic,
+			VirtualDevice device, MqttMessage message) {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
-		
+
 		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
-		
+
 		String messageContent = new String(message.getPayload());
 		String type = messageContent.split(" ")[1];
 		String sensorName = messageContent.split(" ")[2];
@@ -154,8 +204,47 @@ public class MQTTOperations implements MqttCallback {
 		response.put("CODE", "POST");
 		response.put("HEADER", header);
 		response.put("BODY", body);
-		
-		System.out.println(response.toString());
+
+		answer.setPayload(response.toString().getBytes());
+		return answer;
+	}
+
+	private MqttMessage buildFlowAnwserDevice(String topic,
+			VirtualDevice device, MqttMessage message)
+			throws InterruptedException {
+		Random randomGenerator = new Random();
+		MqttMessage answer = new MqttMessage();
+		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
+		// FLOW INFO TEMP {collect:5000, publish:30000}
+		String messageContent = new String(message.getPayload());
+		String type = messageContent.split(" ")[1];
+		String sensorName = messageContent.split(" ")[2];
+		String configuration = messageContent.split(sensorName + " ")[1];
+
+		VirtualSensor sensor = device.getSensor(sensorName);
+
+		Vector<String> results = new Vector<String>();
+		JSONObject confJSON = new JSONObject(configuration);
+		int publish = confJSON.getInt("publish");
+		int collect = confJSON.getInt("collect");
+		while (publish > 0) {
+			int i = randomGenerator.nextInt(sensor.getValues().size());
+			Object value = sensor.getValues().get(i);
+			results.add((String) value);
+			Thread.sleep(collect);
+			publish -= collect;
+		}
+		JSONObject response = new JSONObject();
+		JSONObject header = new JSONObject();
+		JSONObject body = new JSONObject();
+		header.put("NAME", sensor.getDevice().getName());
+		body.put(sensor.getName(), results.toArray());
+		response.put("METHOD", "FLOW");
+		response.put("CODE", "POST");
+		response.put("HEADER", header);
+		response.put("BODY", body);
+
+		System.out.println(response);
 		answer.setPayload(response.toString().getBytes());
 		return answer;
 	}
@@ -169,5 +258,13 @@ public class MQTTOperations implements MqttCallback {
 			System.exit(-1);
 		}
 
+	}
+
+	public Thread getThreadByName(String threadName) {
+		for (Thread t : Thread.getAllStackTraces().keySet()) {
+			if (t.getName().equals(threadName))
+				return t;
+		}
+		return null;
 	}
 }
