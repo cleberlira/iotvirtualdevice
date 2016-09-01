@@ -149,9 +149,7 @@ public class MQTTOperations implements MqttCallback {
 	private boolean isFlowSetOff(String msg){
 		String sensorName = msg.split(" ")[2];
 		String configuration = msg.split(sensorName + " ")[1];
-		
 		JSONObject confJSON = new JSONObject(configuration);
-		
 		if (confJSON.has("turn")){
 			return(!confJSON.getBoolean("turn"));
 		}else{
@@ -184,12 +182,10 @@ public class MQTTOperations implements MqttCallback {
 			VirtualDevice device, MqttMessage message) {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
-
-		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
-
+		//GET temperatureSensor INFO
 		String messageContent = new String(message.getPayload());
-		String type = messageContent.split(" ")[1];
-		String sensorName = messageContent.split(" ")[2];
+		String sensorName = messageContent.split(" ")[1];
+		String type = messageContent.split(" ")[2];
 
 		VirtualSensor sensor = device.getSensor(sensorName);
 		int i = randomGenerator.nextInt(sensor.getValues().size());
@@ -215,16 +211,17 @@ public class MQTTOperations implements MqttCallback {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
 		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
-		// FLOW INFO TEMP {collect:5000, publish:30000}
+		// FLOW tenperatureSensor INFO {collect:5000, publish:30000}
 		String messageContent = new String(message.getPayload());
-		String type = messageContent.split(" ")[1];
-		String sensorName = messageContent.split(" ")[2];
-		String configuration = messageContent.split(sensorName + " ")[1];
-
+		String sensorName = messageContent.split(" ")[1];
+		String type = messageContent.split(" ")[2];
+		String configuration = messageContent.split(type + " ")[1];
+		
 		VirtualSensor sensor = device.getSensor(sensorName);
 
 		Vector<String> results = new Vector<String>();
 		JSONObject confJSON = new JSONObject(configuration);
+		int publishValue = confJSON.getInt("publish");
 		int publish = confJSON.getInt("publish");
 		int collect = confJSON.getInt("collect");
 		while (publish > 0) {
@@ -237,9 +234,14 @@ public class MQTTOperations implements MqttCallback {
 		JSONObject response = new JSONObject();
 		JSONObject header = new JSONObject();
 		JSONObject body = new JSONObject();
+		JSONObject flow = new JSONObject();
+		flow.put("collect", collect);
+		flow.put("publish", publishValue);
 		header.put("NAME", sensor.getDevice().getName());
 		body.put(sensor.getName(), results.toArray());
+		body.put("FLOW", flow);
 		response.put("METHOD", "FLOW");
+		
 		response.put("CODE", "POST");
 		response.put("HEADER", header);
 		response.put("BODY", body);
