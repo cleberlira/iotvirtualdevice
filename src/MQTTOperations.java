@@ -182,10 +182,10 @@ public class MQTTOperations implements MqttCallback {
 			VirtualDevice device, MqttMessage message) {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
-		//GET temperatureSensor INFO
+		//GET INFO temperatureSensor
 		String messageContent = new String(message.getPayload());
-		String sensorName = messageContent.split(" ")[1];
-		String type = messageContent.split(" ")[2];
+		String type = messageContent.split(" ")[1];
+		String sensorName = messageContent.split(" ")[2];
 
 		VirtualSensor sensor = device.getSensor(sensorName);
 		int i = randomGenerator.nextInt(sensor.getValues().size());
@@ -211,11 +211,11 @@ public class MQTTOperations implements MqttCallback {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
 		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
-		// FLOW tenperatureSensor INFO {collect:5000, publish:30000}
+		// FLOW INFO tenperatureSensor {collect:5000, publish:30000}
 		String messageContent = new String(message.getPayload());
-		String sensorName = messageContent.split(" ")[1];
-		String type = messageContent.split(" ")[2];
-		String configuration = messageContent.split(type + " ")[1];
+		String type = messageContent.split(" ")[1];
+		String sensorName = messageContent.split(" ")[2];
+		String configuration = messageContent.split(sensorName + " ")[1];
 		
 		VirtualSensor sensor = device.getSensor(sensorName);
 
