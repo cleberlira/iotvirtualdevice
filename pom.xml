@@ -20,10 +20,15 @@
 			<version>0.4.0</version>
 		</dependency>
 		<dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20140107</version>
-        </dependency>
+                    <groupId>org.json</groupId>
+                    <artifactId>json</artifactId>
+                    <version>20140107</version>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge.jdistlib</groupId>
+                    <artifactId>jdistlib</artifactId>
+                    <version>0.4.5</version>
+                </dependency>
 	</dependencies>
 
 	<build>

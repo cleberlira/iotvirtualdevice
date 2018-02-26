@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +41,11 @@ public class Controller {
 		List<File> xmlFiles = new ArrayList<File>();
 		
 		for (File pf : folder.listFiles()) {
-	      if (pf.isFile() && (pf.getName().endsWith(".xml")||pf.getName().endsWith(".XML"))) {
-	    	  xmlFiles.add(pf);
-	      }
-	    }
+                    if (pf.isFile() && (pf.getName().endsWith(".xml")||pf.getName().endsWith(".XML"))) {
+                      xmlFiles.add(pf);
+                    }
+                }
+                
 		for (File file : xmlFiles) {
 			devices.add(createDevice(file));
 			

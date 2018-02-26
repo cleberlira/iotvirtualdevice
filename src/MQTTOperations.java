@@ -2,6 +2,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import net.sourceforge.jdistlib.Normal;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -54,9 +55,12 @@ public class MQTTOperations implements MqttCallback {
 			
 			this.publisher = new MqttClient(this.brokerUrl + ":"
 					+ this.brokerPort, this.serverId + "_pub");
+                        
+                        
 			this.publisher.setCallback(this);
 			this.publisher.connect(connOpt);
 			
+                        System.out.println("Topic devices publisher");
 		} catch (MqttException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,13 +79,14 @@ public class MQTTOperations implements MqttCallback {
 			this.subscriber.setCallback(this);
 			this.subscriber.connect(connOpt);
 			subscribeDevices(1);
-
+                        System.out.println("Topic devices subscribed");
+                        
 			this.publisher = new MqttClient(this.brokerUrl + ":"
 					+ this.brokerPort, this.serverId + "_publisher");
 			this.publisher.setCallback(this);
 			this.publisher.connect(connOpt);
 
-			System.out.println("Topic devices subscribed");
+			System.out.println("Topic devices publisher");
 		} catch (MqttException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -93,7 +98,8 @@ public class MQTTOperations implements MqttCallback {
 	@Override
 	public void messageArrived(final String topic, final MqttMessage message)
 			throws Exception {
-		System.out.println("-------------------------------------------------");
+		
+                System.out.println("-------------------------------------------------");
 		System.out.println("| Topic:" + topic);
 		System.out.println("| Message: " + new String(message.getPayload()));
 		System.out.println("-------------------------------------------------");
@@ -101,6 +107,8 @@ public class MQTTOperations implements MqttCallback {
 
 		if (messageContent.substring(0, 3).contentEquals(new String("GET"))) {
 			VirtualDevice device = getDeviceOfTopic(topic);
+                        
+                        //alterar função de resposta
 			MqttMessage answer = buildGetAnwserDevice(topic, device, message);
 			this.publisher.publish(topic + "/RES", answer);
 		} else if (messageContent.substring(0, 4).contentEquals(
@@ -118,6 +126,7 @@ public class MQTTOperations implements MqttCallback {
 					public void run() {
 						try {
 							while (true) {
+                                                                //alterar funções de resposta
 								MqttMessage answer = buildFlowAnwserDevice(
 										topic, device, message);
 								publisherInt.publish(topic + "/RES",
@@ -178,11 +187,13 @@ public class MQTTOperations implements MqttCallback {
 		}
 		return null;
 	}
-
-	private MqttMessage buildGetAnwserDevice(String topic,
+           
+        
+      	private MqttMessage buildGetAnwserDevice(String topic,
 			VirtualDevice device, MqttMessage message) {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
+                
 		//GET INFO temperatureSensor
 		String messageContent = new String(message.getPayload());
 		String type = messageContent.split(" ")[1];
@@ -206,32 +217,99 @@ public class MQTTOperations implements MqttCallback {
 		return answer;
 	}
 
-	private MqttMessage buildFlowAnwserDevice(String topic,
+	private double statisticalDistributionGaussTemp(){
+            Random random =  new Random();
+            
+            double value;
+            
+            do {
+                value = random.nextGaussian() * 10 + 10;
+            } while (value <= 17);
+
+            return 0;
+        }
+        
+        
+        private double[] statisticalDistribution(String function, int amount){
+            
+            double result[] = new double[amount];
+            switch (function) {
+                case "normal":  
+                        Normal normal = new Normal(0,1);
+
+                        System.out.println(normal.density(0, false));
+                        System.out.println(normal.cumulative(0, false, false));
+
+                        result = normal.random(amount);
+
+                        break;
+                case "exponential":
+                        
+                        break;
+                case "normalTemperature":
+                    Random random =  new Random();
+            
+                    double value;
+                    for (int i = 0; i < amount; i++) {
+                        
+                        do {
+                            value = random.nextGaussian() * 10 + 10;
+                        } while (value <= 17);
+                        
+                        result[i] = value;
+                    }
+                                       
+                    
+                    break;
+                    
+            }
+            
+            
+            
+           return result;            
+        }
+                
+        
+        
+        
+        private MqttMessage buildFlowAnwserDevice(String topic,
 			VirtualDevice device, MqttMessage message)
 			throws InterruptedException {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
-		// {"CODE":"GET","DATA":"INFO","VAR":"temp"}
+		
+                // {"CODE":"GET","DATA":"INFO","VAR":"temp"}
 		// FLOW INFO tenperatureSensor {collect:5000, publish:30000}
-		String messageContent = new String(message.getPayload());
+                String messageContent = new String(message.getPayload());
 		String type = messageContent.split(" ")[1];
 		String sensorName = messageContent.split(" ")[2];
 		String configuration = messageContent.split(sensorName + " ")[1];
 		
 		VirtualSensor sensor = device.getSensor(sensorName);
-
+                String statiscDistribution = sensor.getStatisticalDistribution();
+                                             
 		Vector<String> results = new Vector<String>();
 		JSONObject confJSON = new JSONObject(configuration);
 		int publishValue = confJSON.getInt("publish");
 		int publish = confJSON.getInt("publish");
 		int collect = confJSON.getInt("collect");
-		while (publish > 0) {
-			int i = randomGenerator.nextInt(sensor.getValues().size());
-			Object value = sensor.getValues().get(i);
-			results.add((String) value);
+		
+                int amount = publish/collect;
+                double[] values = statisticalDistribution("normalTemperature", amount);               
+                
+                while (publish > 0) {
+			//int i = randomGenerator.nextInt(sensor.getValues().size());
+			//Object value = sensor.getValues().get(i);
+			//results.add((String) value);
 			Thread.sleep(collect);
 			publish -= collect;
 		}
+                
+                for (int i = 0; i < values.length; i++) {
+                    results.add(String.valueOf(values[i]));
+                }
+                
+                                
 		JSONObject response = new JSONObject();
 		JSONObject header = new JSONObject();
 		JSONObject body = new JSONObject();

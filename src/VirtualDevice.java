@@ -1,10 +1,9 @@
 import java.util.List;
 
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-
 
 public class VirtualDevice {
-	private String name;
+	
+        private String name;
 	private List<VirtualSensor> sensors;
 	
 	public VirtualDevice(String name, List<VirtualSensor> sensors) {

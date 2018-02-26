@@ -4,7 +4,8 @@ import java.util.List;
 public class VirtualSensor {
 	private String name;
 	private String type_value;
-	private List<Object> values;
+        private String statisticalDistribution;
+        private List<Object> values;
 	private VirtualDevice device;
 	
 	public VirtualSensor(String name, String type_value, List<Object> values, VirtualDevice device) {
@@ -40,4 +41,18 @@ public class VirtualSensor {
 	public void setDevice(VirtualDevice device) {
 		this.device = device;
 	}
+
+        /**
+         * @return the statisticalDistribution
+         */
+        public String getStatisticalDistribution() {
+            return statisticalDistribution;
+        }
+
+        /**
+         * @param statisticalDistribution the statisticalDistribution to set
+         */
+        public void setStatisticalDistribution(String statisticalDistribution) {
+            this.statisticalDistribution = statisticalDistribution;
+        }
 }
