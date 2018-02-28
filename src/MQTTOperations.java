@@ -295,7 +295,7 @@ public class MQTTOperations implements MqttCallback {
 		int collect = confJSON.getInt("collect");
 		
                 int amount = publish/collect;
-                double[] values = statisticalDistribution("normalTemperature", amount);               
+                double[] values = statisticalDistribution(statiscDistribution, amount);               
                 
                 while (publish > 0) {
 			//int i = randomGenerator.nextInt(sensor.getValues().size());

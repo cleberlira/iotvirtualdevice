@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device name="libeliumSmartWaterIons01">
+   
+    <sensors>
+            <sensor name="NitriteNO2Sensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+    </sensor>
+
+    </sensors>
+</device>

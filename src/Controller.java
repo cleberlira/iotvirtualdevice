@@ -47,13 +47,13 @@ public class Controller {
                 }
                 
 		for (File file : xmlFiles) {
-			devices.add(createDevice(file));
+			devices.add(createDeviceUpdate(file));
 			
 		}
 		this.devices = devices;
 	}
 	
-	private VirtualDevice createDevice(File file) throws SAXException, IOException{
+        private VirtualDevice createDevice(File file) throws SAXException, IOException{
 		VirtualDevice device = null;
 		
 		try {
@@ -77,6 +77,50 @@ public class Controller {
 				String type_value = eValue.getAttribute("type");
 				sensors.add(new VirtualSensor(name, type_value, values, device));
 			}
+			device.setSensors(sensors);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		
+		return device;
+	}
+
+        
+        
+        
+        
+            private VirtualDevice createDeviceUpdate(File file) throws SAXException, IOException{
+		VirtualDevice device = null;
+		
+		try {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder;
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document docDevice = dBuilder.parse(file);
+			device = new VirtualDevice(docDevice.getDocumentElement().getAttribute("name"));
+			
+                        System.out.println("Device => " + device.getName() + "  -----------------");
+                        
+			NodeList sensorList = docDevice.getElementsByTagName("sensor");
+			List<VirtualSensor> sensors = new ArrayList<VirtualSensor>();
+			for(int i=0; i < sensorList.getLength(); i++){
+				
+                                Element eSensor = (Element) sensorList.item(i);
+				Element valuesElement = (Element) eSensor.getElementsByTagName("values").item(0);
+                                Element distributionElement = (Element) eSensor.getElementsByTagName("distribution").item(0);
+				
+                                String typeValue = valuesElement.getTextContent();
+                                String distribution =  distributionElement.getTextContent();
+				
+                                String name = eSensor.getAttribute("name");
+				
+				VirtualSensor virtualSensor = new VirtualSensor(name, typeValue, device, distribution);
+                                System.out.println("Virtual Sensor Name => "+virtualSensor.getName() + " --------------");
+                                System.out.println("Virtual Sensor Type Value => "+virtualSensor.getTypeValue());
+                                System.out.println("Virtual Sensor Distribution => "+virtualSensor.getStatisticalDistribution());
+                                sensors.add(virtualSensor);
+			}
+                        
 			device.setSensors(sensors);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
