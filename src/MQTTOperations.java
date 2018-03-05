@@ -216,21 +216,11 @@ public class MQTTOperations implements MqttCallback {
 		answer.setPayload(response.toString().getBytes());
 		return answer;
 	}
-
-	private double statisticalDistributionGaussTemp(){
-            Random random =  new Random();
-            
-            double value;
-            
-            do {
-                value = random.nextGaussian() * 10 + 10;
-            } while (value <= 17);
-
-            return 0;
-        }
-        
+ 
         
         private double[] statisticalDistribution(String function, int amount){
+            Random random =  new Random();
+            
             
             double result[] = new double[amount];
             switch (function) {
@@ -247,7 +237,7 @@ public class MQTTOperations implements MqttCallback {
                         
                         break;
                 case "normalTemperature":
-                    Random random =  new Random();
+                    
             
                     double value;
                     for (int i = 0; i < amount; i++) {
@@ -261,7 +251,17 @@ public class MQTTOperations implements MqttCallback {
                                        
                     
                     break;
+                case "normalTemperatureEdgent":
+                    double currentTemp = 25.0;            
                     
+                    for (int i = 0; i < amount; i++) {
+                        
+                        double newTemp = random.nextGaussian() + currentTemp;
+                        currentTemp = newTemp;
+                        result[i] = currentTemp;
+                    }
+                                  
+                    break;
             }
             
             
