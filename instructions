@@ -1,0 +1,80 @@
+1 - Download or clone Project  (https://github.com/cleberlira/iotvirtualdevice)
+
+2 - In the file config_fog.properties change virtual_devices.path for the your path
+
+3 -  In the class Main change for the path 
+
+Line for to update:
+
+File configFile = new File("/home/elisama/Downloads/IoT_SimulatedDevices-feature-readme-update/config_fog.properties");
+
+
+
+Instructions to run:
+
+Run class VertxMQTTServer.java avaliable at:
+
+https://github.com/WiserUFBA/vertx-mqttt-client/tree/testwithvirtual/src/main/java/br/ufba/dcc/wiser
+
+Output
+
+MQTT server is listening on port 1883
+
+
+After that:
+
+1 - Open project iotvirtualdevice in your IDE
+
+2 - Run class Main
+
+After same seconds looks:
+
+Device => libeliumSmartWaterIons01  -----------------
+Virtual Sensor Name => NitriteNO2Sensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Device => libeliumSmartWater01  -----------------
+Virtual Sensor Name => TemperatureSensorPt-1000 --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Virtual Sensor Name => ConductivitySensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Virtual Sensor Name => DissolvedOxygenSensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Virtual Sensor Name => pHSensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Virtual Sensor Name => OxidationReductionPotentialSensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+Virtual Sensor Name => TurbiditySensor --------------
+Virtual Sensor Type Value => integer
+Virtual Sensor Distribution => normalTemperature
+OPA
+Topic devices subscribed
+-------------------------------------------------
+| Topic:dev/libeliumSmartWater01
+| Message: FLOW VALUE ConductivitySensor {collect:30000,publish:60000}
+-------------------------------------------------
+Topic devices publisher
+{"CODE":"POST","METHOD":"FLOW","HEADER":{"NAME":"libeliumSmartWater01"},"BODY":{"FLOW":{"publish":60000,"collect":30000},"ConductivitySensor":["23.093467592045226","26.859918300046964"]}}
+-------------------------------------------------
+
+In Vertx MQTT Server looks that message:
+
+Just received message on [dev/libeliumSmartWater01/RES] payload [{"CODE":"POST","METHOD":"FLOW","HEADER":{"NAME":"libeliumSmartWater01"},"BODY":{"FLOW":{"publish":60000,"collect":30000},"ConductivitySensor":["33.906872660018124","21.44499076313658"]}}] with QoS [AT_LEAST_ONCE]
+Just received message on [dev/libeliumSmartWater01/RES] payload [{"CODE":"POST","METHOD":"FLOW","HEADER":{"NAME":"libeliumSmartWater01"},"BODY":{"FLOW":{"publish":60000,"collect":30000},"ConductivitySensor":["37.98856861830963","30.386044349242816"]}}] with QoS [AT_LEAST_ONCE]
+
+
+3 - Run Class PublisherPaho avaliable at:
+
+https://github.com/WiserUFBA/vertx-mqttt-client/tree/testwithvirtual/src/main/java/br/ufba/dcc/wiser
+
+It was to print the message of method messageArrived but not is working
+
+
+
+
+
