@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<device name="libeliumSmartWater01">
+    <sensors>
+        <sensor name="TemperatureSensorPt-1000">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+
+        <sensor name="ConductivitySensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+
+         <sensor name="DissolvedOxygenSensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+
+        <sensor name="pHSensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+        
+        <sensor name="OxidationReductionPotentialSensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+
+        <sensor name="TurbiditySensor">
+            <values>integer</values>
+            <distribution>normalTemperature</distribution>
+        </sensor>
+
+    </sensors>
+</device>
