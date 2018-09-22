@@ -38,7 +38,7 @@ public class MQTTOperations implements MqttCallback {
 		this.password = password;
 		this.devices = devices;
 
-		this.flowStatus = new Hashtable<String, Object>();
+		  this.flowStatus = new Hashtable<String, Object>();
 
 		try {
 //			if (!this.username.isEmpty())
