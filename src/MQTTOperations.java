@@ -14,9 +14,9 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.json.JSONObject;
 
 public class MQTTOperations implements MqttCallback {
-
+        int messaggiArrivati; 
 	public static String topicPrefix = "dev/";
-
+        long t1, t2, t3;
 	private String brokerUrl;
 	private String brokerPort;
 	private String serverId;
@@ -41,10 +41,10 @@ public class MQTTOperations implements MqttCallback {
 		this.flowStatus = new Hashtable<String, Object>();
 
 		try {
-			if (!this.username.isEmpty())
-				connOpt.setUserName(this.username);
-			if (!this.password.isEmpty())
-				connOpt.setPassword(this.password.toCharArray());
+//			if (!this.username.isEmpty())
+//				connOpt.setUserName(this.username);
+//			if (!this.password.isEmpty())
+//				connOpt.setPassword(this.password.toCharArray());
 
 			this.subscriber = new MqttClient(this.brokerUrl + ":"
 					+ this.brokerPort, this.serverId);
@@ -61,6 +61,8 @@ public class MQTTOperations implements MqttCallback {
 			this.publisher.connect(connOpt);
 			
                         System.out.println("Topic devices publisher");
+                        
+                        
 		} catch (MqttException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,6 +101,10 @@ public class MQTTOperations implements MqttCallback {
 	public void messageArrived(final String topic, final MqttMessage message)
 			throws Exception {
 		
+            //   t1 = System.currentTimeMillis();
+               
+           //    System.out.println("t1 "  + t1);
+                
                 System.out.println("-------------------------------------------------");
 		System.out.println("| Topic:" + topic);
 		System.out.println("| Message: " + new String(message.getPayload()));
@@ -131,6 +137,7 @@ public class MQTTOperations implements MqttCallback {
 										topic, device, message);
 								publisherInt.publish(topic + "/RES",
 								answer);
+                                                                
 							}
 						} catch (InterruptedException v) {
 							System.out.println(v);
@@ -146,6 +153,7 @@ public class MQTTOperations implements MqttCallback {
 				flow.start();
 				flow.setName(device.getName() + sensorName);
 			}
+                       
 		}
 
 	}
@@ -170,7 +178,7 @@ public class MQTTOperations implements MqttCallback {
 	private void subscribeDevices(int qos) {
 		for (int i = 0; i < this.devices.size(); i++) {
 			try {
-				String topic = topicPrefix + devices.get(i).getName() + "/#";
+				String topic = topicPrefix + devices.get(i).getName() ;
 				this.subscriber.subscribe(topic, qos);
 			} catch (MqttException e) {
 				e.printStackTrace();
@@ -277,7 +285,7 @@ public class MQTTOperations implements MqttCallback {
 			throws InterruptedException {
 		Random randomGenerator = new Random();
 		MqttMessage answer = new MqttMessage();
-		
+		  t1 = System.currentTimeMillis();
                 // {"CODE":"GET","DATA":"INFO","VAR":"temp"}
 		// FLOW INFO tenperatureSensor {collect:5000, publish:30000}
                 String messageContent = new String(message.getPayload());
@@ -327,6 +335,14 @@ public class MQTTOperations implements MqttCallback {
 
 		System.out.println(response);
 		answer.setPayload(response.toString().getBytes());
+                t2 = System.currentTimeMillis();
+              
+                System.out.println("t1 " + t1);
+                 System.out.println("t2 " + t2);
+                t3 = t2 - t1;
+               messaggiArrivati++; 
+               System.out.println(t3);
+               System.out.println("qtd " + messaggiArrivati);
 		return answer;
 	}
 

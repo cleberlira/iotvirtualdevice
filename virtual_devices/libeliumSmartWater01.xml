@@ -31,5 +31,6 @@
             <distribution>normalTemperature</distribution>
         </sensor>
 
+
     </sensors>
 </device>

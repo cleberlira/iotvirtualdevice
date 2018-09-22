@@ -15,7 +15,7 @@ public class Main {
 			Properties config = new Properties();
 			
                         
-                        File configFile = new File("/home/brennomello/NetBeansProjects/IoT_SimulatedDevices/config_fog.properties");
+                        File configFile = new File("/home/cleberlira/NetBeansProjects/IoT_SimulatedDevices/config_fog.properties");
                         FileInputStream file = new FileInputStream(configFile);
                
 			config.load(file);
